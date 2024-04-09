@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box, Button, Heading, HStack, VStack, Text, SimpleGrid } from "@chakra-ui/react";
+import RouletteTable from "../components/RouletteTable";
 
 const SPIN_DURATION = 5; // duration of the spin animation in seconds
 
@@ -104,6 +105,7 @@ const Index = () => {
         <Heading as="h2" size="lg" mb={4}>
           Roulette Table
         </Heading>
+        <RouletteTable />
         <HStack spacing={4} justify="center" mb={4}>
           {jetonValues.map((value) => (
             <Button key={value} onClick={() => handleJetonSelect(value)} variant={selectedJeton === value ? "solid" : "outline"} colorScheme="blue">
