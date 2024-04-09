@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Heading, HStack, VStack, Text } from "@chakra-ui/react";
+import { Box, Button, Heading, HStack, VStack, Text, SimpleGrid } from "@chakra-ui/react";
 
 const SPIN_DURATION = 5; // duration of the spin animation in seconds
 
@@ -12,8 +12,30 @@ const Index = () => {
 
   const jetonValues = [10, 25, 50, 100, 1000];
 
+  const betOptions = [
+    { name: "0", payout: 12 },
+    { name: "1-12", payout: 2.95 },
+    { name: "Even", payout: 1.95 },
+    { name: "Odd", payout: 1.95 },
+    { name: "Red", payout: 1.95 },
+    { name: "Black", payout: 1.95 },
+    { name: "1-6", payout: 1.95 },
+    { name: "4-9", payout: 1.95 },
+    { name: "7-12", payout: 1.95 },
+  ];
+
+  const [bets, setBets] = useState({});
+
   const handleJetonSelect = (value) => {
     setSelectedJeton(value);
+  };
+
+  const handlePlaceBet = (betName) => {
+    setBets((prevBets) => ({
+      ...prevBets,
+      [betName]: (prevBets[betName] || 0) + selectedJeton,
+    }));
+    setBalance((prevBalance) => prevBalance - selectedJeton);
   };
 
   useEffect(() => {
@@ -21,7 +43,18 @@ const Index = () => {
 
     const timeout = setTimeout(() => {
       setIsSpinning(false);
-      setResult(numbers[Math.floor(Math.random() * numbers.length)]);
+      const resultNumber = numbers[Math.floor(Math.random() * numbers.length)];
+      setResult(resultNumber);
+
+      let winnings = 0;
+      for (const [betName, betAmount] of Object.entries(bets)) {
+        const { payout } = betOptions.find((option) => option.name === betName);
+        if ((betName === "Even" && resultNumber % 2 === 0) || (betName === "Odd" && resultNumber % 2 !== 0) || (betName === "Red" && [1, 3, 5, 7, 9, 11].includes(resultNumber)) || (betName === "Black" && [2, 4, 6, 8, 10, 12].includes(resultNumber)) || (betName === "1-6" && resultNumber >= 1 && resultNumber <= 6) || (betName === "4-9" && resultNumber >= 4 && resultNumber <= 9) || (betName === "7-12" && resultNumber >= 7 && resultNumber <= 12) || betName === resultNumber.toString()) {
+          winnings += betAmount * payout;
+        }
+      }
+      setBalance((prevBalance) => prevBalance + winnings);
+      setBets({});
     }, SPIN_DURATION * 1000);
 
     return () => clearTimeout(timeout);
@@ -79,7 +112,20 @@ const Index = () => {
           ))}
         </HStack>
         <Text mb={4}>Balance: {balance}</Text>
-        {}
+        <SimpleGrid columns={3} spacing={4} mb={8}>
+          {betOptions.map(({ name, payout }) => (
+            <Button key={name} onClick={() => handlePlaceBet(name)} disabled={isSpinning || selectedJeton > balance}>
+              {name} (x{payout})
+            </Button>
+          ))}
+        </SimpleGrid>
+        <VStack spacing={2} align="flex-start">
+          {Object.entries(bets).map(([betName, betAmount]) => (
+            <Text key={betName}>
+              {betName}: {betAmount}
+            </Text>
+          ))}
+        </VStack>
       </Box>
     </Box>
   );
