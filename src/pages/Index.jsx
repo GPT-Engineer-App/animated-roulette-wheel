@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, Heading } from "@chakra-ui/react";
+import { Box, Button, Heading, HStack, VStack, Text } from "@chakra-ui/react";
 
 const SPIN_DURATION = 5; // duration of the spin animation in seconds
 
@@ -7,6 +7,14 @@ const Index = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState(null);
   const numbers = [0, 5, 12, 3, 10, 1, 8, 9, 2, 7, 6, 11, 4];
+  const [selectedJeton, setSelectedJeton] = useState(10);
+  const [balance, setBalance] = useState(1000);
+
+  const jetonValues = [10, 25, 50, 100, 1000];
+
+  const handleJetonSelect = (value) => {
+    setSelectedJeton(value);
+  };
 
   useEffect(() => {
     if (!isSpinning) return;
@@ -58,6 +66,21 @@ const Index = () => {
       >
         {isSpinning ? "Spinning..." : "Spin"}
       </Button>
+
+      <Box mt={8}>
+        <Heading as="h2" size="lg" mb={4}>
+          Roulette Table
+        </Heading>
+        <HStack spacing={4} justify="center" mb={4}>
+          {jetonValues.map((value) => (
+            <Button key={value} onClick={() => handleJetonSelect(value)} variant={selectedJeton === value ? "solid" : "outline"} colorScheme="blue">
+              {value}
+            </Button>
+          ))}
+        </HStack>
+        <Text mb={4}>Balance: {balance}</Text>
+        {}
+      </Box>
     </Box>
   );
 };
